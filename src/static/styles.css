@@ -664,3 +664,70 @@ footer {
 #logout-button:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
+
+/* Social Sharing Buttons */
+.social-sharing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-light);
+  justify-content: center;
+}
+
+.share-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.share-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.share-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.share-button.facebook {
+  background-color: #1877f2;
+}
+
+.share-button.facebook:hover {
+  background-color: #0c63d4;
+}
+
+.share-button.twitter {
+  background-color: #000000;
+}
+
+.share-button.twitter:hover {
+  background-color: #333333;
+}
+
+.share-button.email {
+  background-color: #ea4335;
+}
+
+.share-button.email:hover {
+  background-color: #c53929;
+}
+
+.share-icon {
+  line-height: 1;
+  font-family: Arial, sans-serif;
+}

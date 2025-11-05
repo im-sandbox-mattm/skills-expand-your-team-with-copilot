@@ -569,6 +569,18 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="social-sharing">
+        <span class="share-label">Share:</span>
+        <button class="share-button facebook" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Facebook">
+          <span class="share-icon">f</span>
+        </button>
+        <button class="share-button twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Twitter">
+          <span class="share-icon">𝕏</span>
+        </button>
+        <button class="share-button email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}" title="Share via Email">
+          <span class="share-icon">✉</span>
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +598,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for social sharing buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const activityName = e.currentTarget.dataset.activity;
+        const description = e.currentTarget.dataset.description;
+        const schedule = e.currentTarget.dataset.schedule;
+        const platform = e.currentTarget.classList.contains("facebook") ? "facebook" :
+                        e.currentTarget.classList.contains("twitter") ? "twitter" : "email";
+        handleShare(platform, activityName, description, schedule);
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -809,6 +834,33 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       messageDiv.classList.add("hidden");
     }, 5000);
+  }
+
+  // Handle social sharing
+  function handleShare(platform, activityName, description, schedule) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareText = `Check out ${activityName} at Mergington High School! ${description}`;
+    const fullText = schedule ? `${shareText}\nSchedule: ${schedule}` : shareText;
+    
+    switch (platform) {
+      case "facebook":
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseUrl)}&quote=${encodeURIComponent(shareText)}`;
+        window.open(facebookUrl, "_blank", "width=600,height=400");
+        break;
+      
+      case "twitter":
+        const twitterText = shareText.length > 280 ? shareText.substring(0, 277) + "..." : shareText;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(baseUrl)}`;
+        window.open(twitterUrl, "_blank", "width=600,height=400");
+        break;
+      
+      case "email":
+        const emailSubject = `Mergington High School: ${activityName}`;
+        const emailBody = `${fullText}\n\nLearn more and register: ${baseUrl}`;
+        const emailUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = emailUrl;
+        break;
+    }
   }
 
   // Handle form submission
