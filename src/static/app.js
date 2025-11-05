@@ -34,6 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Social sharing constants
+  const TWITTER_CHAR_LIMIT = 280;
+  const ELLIPSIS_LENGTH = 3;
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -606,9 +610,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityName = e.currentTarget.dataset.activity;
         const description = e.currentTarget.dataset.description;
         const schedule = e.currentTarget.dataset.schedule;
-        const platform = e.currentTarget.classList.contains("facebook") ? "facebook" :
-                        e.currentTarget.classList.contains("twitter") ? "twitter" : "email";
-        handleShare(platform, activityName, description, schedule);
+        
+        // Determine platform from button classes
+        let platform;
+        if (e.currentTarget.classList.contains("facebook")) {
+          platform = "facebook";
+        } else if (e.currentTarget.classList.contains("twitter")) {
+          platform = "twitter";
+        } else if (e.currentTarget.classList.contains("email")) {
+          platform = "email";
+        }
+        
+        if (platform) {
+          handleShare(platform, activityName, description, schedule);
+        }
       });
     });
 
@@ -849,7 +864,9 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       
       case "twitter":
-        const twitterText = shareText.length > 280 ? shareText.substring(0, 277) + "..." : shareText;
+        const twitterText = shareText.length > TWITTER_CHAR_LIMIT 
+          ? shareText.substring(0, TWITTER_CHAR_LIMIT - ELLIPSIS_LENGTH) + "..." 
+          : shareText;
         const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(baseUrl)}`;
         window.open(twitterUrl, "_blank", "width=600,height=400");
         break;
