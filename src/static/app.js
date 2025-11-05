@@ -266,6 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("dark-mode");
       themeIcon.textContent = "☀️";
     } else {
+      // Default to light mode if no preference or 'light' is saved
+      document.body.classList.remove("dark-mode");
       themeIcon.textContent = "🌙";
     }
   }
