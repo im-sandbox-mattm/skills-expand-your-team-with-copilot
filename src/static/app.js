@@ -34,6 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Social sharing constants
+  const TWITTER_CHAR_LIMIT = 280;
+  const ELLIPSIS_LENGTH = 3;
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -569,6 +573,18 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="social-sharing">
+        <span class="share-label">Share:</span>
+        <button class="share-button facebook" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" title="Share on Facebook" aria-label="Share ${escapeHtml(name)} on Facebook">
+          <span class="share-icon" aria-hidden="true">f</span>
+        </button>
+        <button class="share-button twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" title="Share on X (Twitter)" aria-label="Share ${escapeHtml(name)} on X">
+          <span class="share-icon" aria-hidden="true">X</span>
+        </button>
+        <button class="share-button email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}" title="Share via Email" aria-label="Share ${escapeHtml(name)} via Email">
+          <span class="share-icon" aria-hidden="true">✉</span>
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +602,30 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for social sharing buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const activityName = e.currentTarget.dataset.activity;
+        const description = e.currentTarget.dataset.description;
+        const schedule = e.currentTarget.dataset.schedule;
+        
+        // Determine platform from button classes
+        let platform;
+        if (e.currentTarget.classList.contains("facebook")) {
+          platform = "facebook";
+        } else if (e.currentTarget.classList.contains("twitter")) {
+          platform = "twitter";
+        } else if (e.currentTarget.classList.contains("email")) {
+          platform = "email";
+        }
+        
+        if (platform) {
+          handleShare(platform, activityName, description, schedule);
+        }
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -809,6 +849,42 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       messageDiv.classList.add("hidden");
     }, 5000);
+  }
+
+  // Handle social sharing
+  function handleShare(platform, activityName, description, schedule) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareText = `Check out ${activityName} at Mergington High School! ${description}`;
+    const fullText = schedule ? `${shareText}\nSchedule: ${schedule}` : shareText;
+    
+    switch (platform) {
+      case "facebook":
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseUrl)}&quote=${encodeURIComponent(shareText)}`;
+        window.open(facebookUrl, "_blank", "width=600,height=400");
+        break;
+      
+      case "twitter":
+        const twitterText = shareText.length > TWITTER_CHAR_LIMIT 
+          ? shareText.substring(0, TWITTER_CHAR_LIMIT - ELLIPSIS_LENGTH) + "..." 
+          : shareText;
+        const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(baseUrl)}`;
+        window.open(twitterUrl, "_blank", "width=600,height=400");
+        break;
+      
+      case "email":
+        const emailSubject = `Mergington High School: ${activityName}`;
+        const emailBody = `${fullText}\n\nLearn more and register: ${baseUrl}`;
+        const emailUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = emailUrl;
+        break;
+    }
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // Handle form submission
