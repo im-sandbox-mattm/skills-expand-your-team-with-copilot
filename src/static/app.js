@@ -571,14 +571,14 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="social-sharing">
         <span class="share-label">Share:</span>
-        <button class="share-button facebook" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Facebook">
-          <span class="share-icon">f</span>
+        <button class="share-button facebook" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" title="Share on Facebook" aria-label="Share ${escapeHtml(name)} on Facebook">
+          <span class="share-icon" aria-hidden="true">f</span>
         </button>
-        <button class="share-button twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" title="Share on Twitter">
-          <span class="share-icon">𝕏</span>
+        <button class="share-button twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" title="Share on X (Twitter)" aria-label="Share ${escapeHtml(name)} on X">
+          <span class="share-icon" aria-hidden="true">X</span>
         </button>
-        <button class="share-button email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}" title="Share via Email">
-          <span class="share-icon">✉</span>
+        <button class="share-button email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}" title="Share via Email" aria-label="Share ${escapeHtml(name)} via Email">
+          <span class="share-icon" aria-hidden="true">✉</span>
         </button>
       </div>
     `;
@@ -850,7 +850,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       case "twitter":
         const twitterText = shareText.length > 280 ? shareText.substring(0, 277) + "..." : shareText;
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(baseUrl)}`;
+        const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(baseUrl)}`;
         window.open(twitterUrl, "_blank", "width=600,height=400");
         break;
       
@@ -861,6 +861,13 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = emailUrl;
         break;
     }
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // Handle form submission
